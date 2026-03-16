@@ -4,6 +4,26 @@ Personal dashboard for analyzing Garmin running data from a GDPR export. Built w
 
 ![Dashboard screenshot](docs/app_screenshot.png)
 
+## Why this instead of Garmin Connect?
+
+Garmin Connect is great for logging activities, but its analytics are limited. This dashboard goes further:
+
+| Feature | Garmin Connect | This app |
+|---|---|---|
+| Grade Adjusted Pace (GAP) | Per activity only | Used consistently in all charts and comparisons |
+| HR zone distribution | Fixed max-HR zones | Friel zones derived from your LTHR, computed from per-second FIT data (not activity averages) |
+| Walk-segment removal | No | Strips walk segments before computing pace, HR, cadence, VO, GCT |
+| Aerobic decoupling trend | Single activity | Time-series across all activities with 60-day smoothing |
+| Pace-at-HR trend | No | Track how fast you run at a fixed HR band over months |
+| VO2max trend | Chart only | Overlay with 30-day rolling average, filterable by activity type |
+| Efficiency Factor (EF) | No | Speed/HR ratio over time, filterable by pace band |
+| Z2 training tracker | No | EF at Z2 + monthly zone distribution stacked chart |
+| Segment comparison | No | Split any run into halves or km splits, compare GAP and HR |
+| Running technique trends | No | Cadence, vertical oscillation, GCT, stride length, vertical ratio over time with Garmin percentile color bands |
+| Technique correlations | No | Scatter plots of any technique metric vs any other |
+| Route heatmap | Basic map | GPS density heatmap across all activities |
+| LLM training summary | No | Generates a prompt-ready summary of your training for use with any AI assistant (will be used later when connected with an LLM like Qwen3.5-35b) |
+
 
 ## Project structure
 
