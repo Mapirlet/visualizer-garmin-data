@@ -2,6 +2,9 @@
 
 Personal dashboard for analyzing Garmin running data from a GDPR export. Built with FastAPI and React.
 
+![Dashboard screenshot](docs/app_screenshot.png)
+
+
 ## Project structure
 
 ```
