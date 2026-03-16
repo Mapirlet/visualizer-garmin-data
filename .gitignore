@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Data (never commit personal health data)
+data/
+
+# Frontend build output and dependencies
+frontend/node_modules/
+frontend/dist/
+
+# macOS
+.DS_Store

@@ -1,0 +1,8 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount local data instead of baking it in — useful for development
+      - ./data:/app/data
