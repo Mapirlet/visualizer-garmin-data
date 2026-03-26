@@ -109,8 +109,7 @@ def get_decoupling_trend(
 
 @router.get("/progress/z2")
 def get_z2(
-    z2_lo: int = 160,
-    z2_hi: int = 174,
+    zones: str = "141,158,177,188",
     start: Optional[date] = None,
     end: Optional[date] = None,
     types: Optional[str] = None,
@@ -118,6 +117,9 @@ def get_z2(
     df = _tech_filtered(start, end, types)
     if df is None:
         return {"ef_points": [], "zone_dist": [], "has_data": False}
+
+    bounds = [float(x) for x in zones.split(",")]
+    z2_lo, z2_hi = int(bounds[0]), int(bounds[1])
 
     # EF at Z2 — use GAP when available so trail runs don't inflate EF on downhills
     pace_col_z2 = "avg_gap_min_km" if "avg_gap_min_km" in df.columns and df["avg_gap_min_km"].notna().sum() > 0 else "avg_pace_min_km"
@@ -130,15 +132,10 @@ def get_z2(
     else:
         ef_points = []
 
-    # Monthly zone distribution using per-second HR histograms from FIT data.
-    # Friel zone boundaries derived from LTHR (≈ z2_hi):
-    #   Z1 < 81% LTHR, Z2 81-90%, Z3 90-100%, Z4 100-106%, Z5 > 106%
-    lthr = z2_hi
-    friel_bounds = [lthr * 0.81, lthr * 0.90, lthr * 1.00, lthr * 1.06]
     zone_label_map = {1: "Z1 recovery", 2: "Z2 aerobic", 3: "Z3 tempo", 4: "Z4 threshold", 5: "Z5 max"}
 
     def _bpm_to_zone(bpm: int) -> int:
-        for i, b in enumerate(friel_bounds):
+        for i, b in enumerate(bounds):
             if bpm < b:
                 return i + 1
         return 5

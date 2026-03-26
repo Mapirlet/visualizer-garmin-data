@@ -17,9 +17,6 @@ export default function Progress() {
   const filters = useFilters()
   const [hrBand, setHrBand] = useState<[number, number]>([filters.hrZones[0], filters.hrZones[1]])
 
-  const z2Lo = filters.hrZones[0]
-  const z2Hi = filters.hrZones[1]
-
   const { data: vo2Data, isLoading: vo2Loading } = useQuery({
     queryKey: ['vo2max', filters.start, filters.end, filters.types],
     queryFn: () => api.vo2max(filters),
@@ -38,9 +35,12 @@ export default function Progress() {
     enabled: !!filters.start,
   })
 
+  const z2Lo = filters.hrZones[0]
+  const z2Hi = filters.hrZones[1]
+
   const { data: z2Data, isLoading: z2Loading } = useQuery({
-    queryKey: ['z2', filters.start, filters.end, filters.types, z2Lo, z2Hi],
-    queryFn: () => api.z2(filters, z2Lo, z2Hi),
+    queryKey: ['z2', filters.start, filters.end, filters.types, filters.hrZones.join(',')],
+    queryFn: () => api.z2(filters, filters.hrZones),
     enabled: !!filters.start,
   })
 
@@ -135,10 +135,10 @@ export default function Progress() {
       <section>
         <h3 className="text-base font-medium text-white mb-1">Aerobic Decoupling Over Time</h3>
         <p className="text-garmin-muted text-sm mb-3">
-          Aerobic decoupling measures cardiac drift: how much your HR rises relative to pace as a run progresses.
+          Aerobic decoupling measures cardiac drift, meaning how much your HR rises relative to pace as a run progresses.
           It compares Efficiency Factor (pace ÷ HR) in the first half vs the second half.
-          A downward trend over weeks means your heart is drifting less at the same effort — your aerobic base is building.
-          Green line = 5% threshold (solid base). Red line = 10% (aerobically taxed). Uses GAP so trail elevation doesn't distort the result.
+          A downward trend over weeks means your heart is drifting less at the same effort. Your aerobic base is building.
+          Green line is the 5% threshold (solid base). Red line is 10% (aerobically taxed). Uses GAP so trail elevation doesn't distort the result.
         </p>
         {decLoading ? <LoadingError loading /> : !decData?.has_data ? (
           <LoadingError cacheMsg="uv run python -m src.cache" />

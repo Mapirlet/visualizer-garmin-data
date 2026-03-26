@@ -50,7 +50,7 @@ app.add_middleware(
 )
 
 # Mount API routers
-from api.routers import activities, sleep, technique, gps, fit, export, progress
+from api.routers import activities, sleep, technique, gps, fit, export, progress, physio
 
 app.include_router(activities.router, prefix="/api")
 app.include_router(sleep.router,      prefix="/api")
@@ -59,6 +59,7 @@ app.include_router(gps.router,        prefix="/api")
 app.include_router(fit.router,        prefix="/api")
 app.include_router(export.router,     prefix="/api")
 app.include_router(progress.router,   prefix="/api")
+app.include_router(physio.router,     prefix="/api")
 
 
 @app.get("/api/health")

@@ -89,9 +89,15 @@ export const api = {
     client.get('/progress/decoupling', {
       params: { start: f.start, end: f.end, types: typesParam(f.types) },
     }).then(r => r.data),
-  z2: (f: Filters, z2Lo: number, z2Hi: number) =>
+  z2: (f: Filters, zones: number[]) =>
     client.get('/progress/z2', {
-      params: { start: f.start, end: f.end, types: typesParam(f.types), z2_lo: z2Lo, z2_hi: z2Hi },
+      params: { start: f.start, end: f.end, types: typesParam(f.types), zones: zones.join(',') },
+    }).then(r => r.data),
+
+  // Physio report
+  physioReport: (injuryDate: string, weeksBack: number, types: string[], zones: number[]) =>
+    client.get('/physio/report', {
+      params: { injury_date: injuryDate, weeks_back: weeksBack, types: types.length ? types.join(',') : undefined, zones: zones.join(',') },
     }).then(r => r.data),
 
   // Export

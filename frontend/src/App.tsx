@@ -13,6 +13,7 @@ import Routes_ from './pages/Routes'
 import Progress from './pages/Progress'
 import ActivityDetail from './pages/ActivityDetail'
 import Summary from './pages/Summary'
+import PhysioReport from './pages/PhysioReport'
 
 function AppRoutes() {
   const { setStart, setEnd, setTypes } = useFilters()
@@ -57,6 +58,7 @@ function AppRoutes() {
         <Route path="routes" element={<Routes_ />} />
         <Route path="progress" element={<Progress />} />
         <Route path="activity/:id?" element={<ActivityDetail />} />
+        <Route path="physio" element={<PhysioReport />} />
         <Route path="summary" element={<Summary />} />
       </Route>
     </Routes>

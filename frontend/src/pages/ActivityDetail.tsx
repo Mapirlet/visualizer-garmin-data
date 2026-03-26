@@ -86,6 +86,7 @@ export default function ActivityDetail() {
     return `${m}:${s} /km`
   }
 
+
   // Use grade-adjusted pace when altitude data is available (trail running)
   const hasGap = runRecords.some((r: any) => r.gap != null)
   const paceField = hasGap ? 'gap' : 'pace'
@@ -115,14 +116,14 @@ export default function ActivityDetail() {
     },
   ] : []
 
-  const CHARTS: { col: string; label: string; zoneKey?: string; reversed?: boolean }[] = [
-    { col: 'heart_rate', label: 'HR (bpm)' },
-    { col: 'gap', label: 'Grade-Adj. Pace (min/km)', reversed: true },
-    { col: 'cadence_spm', label: 'Cadence (spm)', zoneKey: 'cadence_spm_zone' },
-    { col: 'vertical_ratio', label: 'Vertical Ratio (%)', zoneKey: 'vertical_ratio_zone' },
-    { col: 'ground_contact_time', label: 'Ground Contact Time (ms)', zoneKey: 'ground_contact_time_zone' },
-    { col: 'vertical_oscillation', label: 'Vertical Oscillation (cm)', zoneKey: 'vertical_oscillation_zone' },
-    { col: 'stride_length', label: 'Stride Length (cm)' },
+  const CHARTS: { col: string; label: string; zoneKey?: string; reversed?: boolean; fmtAvg: (v: number) => string }[] = [
+    { col: 'heart_rate',          label: 'HR (bpm)',                   fmtAvg: v => `${Math.round(v)} bpm` },
+    { col: 'gap',                 label: `${paceLabel} (min/km)`,      reversed: true, fmtAvg: v => fmtPace(v) },
+    { col: 'cadence_spm',         label: 'Cadence (spm)',              zoneKey: 'cadence_spm_zone',           fmtAvg: v => `${Math.round(v)} spm` },
+    { col: 'vertical_ratio',      label: 'Vertical Ratio (%)',         zoneKey: 'vertical_ratio_zone',        fmtAvg: v => `${v.toFixed(1)}%` },
+    { col: 'ground_contact_time', label: 'Ground Contact Time (ms)',   zoneKey: 'ground_contact_time_zone',   fmtAvg: v => `${Math.round(v)} ms` },
+    { col: 'vertical_oscillation',label: 'Vertical Oscillation (cm)',  zoneKey: 'vertical_oscillation_zone',  fmtAvg: v => `${v.toFixed(1)} cm` },
+    { col: 'stride_length',       label: 'Stride Length (m)',          fmtAvg: v => `${v.toFixed(2)} m` },
   ]
 
   return (
@@ -143,20 +144,21 @@ export default function ActivityDetail() {
             ))}
           </select>
 
+
           {decData?.decoupling != null && (
             <div className={`rounded-lg px-4 py-3 text-sm border ${
               decData.level === 'good' ? 'bg-green-900/30 border-green-700 text-green-300' :
               decData.level === 'borderline' ? 'bg-yellow-900/30 border-yellow-700 text-yellow-300' :
               'bg-red-900/30 border-red-700 text-red-300'
             }`}>
-              <p className="font-medium mb-1">Aerobic Decoupling — {decData.label}</p>
+              <p className="font-medium mb-1">Aerobic Decoupling ({decData.label})</p>
               <p className="opacity-80">
-                Aerobic decoupling measures cardiac drift: how much your heart rate rises relative to pace during the run.
+                Aerobic decoupling measures cardiac drift, meaning how much your heart rate rises relative to pace during the run.
                 It compares your Efficiency Factor (pace ÷ HR) in the first half versus the second half.
-                Below 5% means your aerobic system handled the effort without drifting — your base is solid for this pace.
+                Below 5% means your aerobic system handled the effort without drifting. Your base is solid for this pace.
                 Above 10% means your heart was working progressively harder to maintain the same speed, a sign the effort
                 was beyond your current aerobic capacity. Uses grade-adjusted pace so trail climbs don't distort the result.
-                Most reliable on flat or rolling terrain — on runs where D+ is heavily front- or back-loaded, cardiac drift
+                Most reliable on flat or rolling terrain. On runs where D+ is heavily front- or back-loaded, cardiac drift
                 may still reflect elevation distribution rather than true aerobic fatigue.
               </p>
             </div>
@@ -165,7 +167,7 @@ export default function ActivityDetail() {
           {segMetrics.length > 0 && (
             <div className="bg-garmin-surface border border-garmin-border rounded-lg p-4">
               <p className="text-sm font-medium text-white mb-3">
-                Start vs End ({segKm.toFixed(1)} km segments — muscular endurance check)
+                Start vs End ({segKm.toFixed(1)} km segments, muscular endurance check)
               </p>
               <div className="grid grid-cols-3 gap-3">
                 {segMetrics.map(({ label, first, last, fmt, lowerIsBetter }) => {
@@ -255,12 +257,14 @@ export default function ActivityDetail() {
               </p>
 
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                {CHARTS.map(({ col, label, zoneKey, reversed }) => {
+                {CHARTS.map(({ col, label, zoneKey, reversed, fmtAvg }) => {
                   const pts = records.filter((r: any) => r[col] != null && r.distance_km != null)
                   if (pts.length === 0) return null
 
                   const runPts = pts.filter((r: any) => !r.is_walking)
                   const walkPts = pts.filter((r: any) => r.is_walking)
+                  const avg = segAvg(runPts, col)
+                  const chartTitle = avg != null ? `${label} (avg ${fmtAvg(avg)})` : label
 
                   const altPts = records.filter((r: any) => r.altitude != null && r.distance_km != null)
 
@@ -316,7 +320,7 @@ export default function ActivityDetail() {
                   return (
                     <Chart
                       key={col}
-                      title={label}
+                      title={chartTitle}
                       data={traces}
                       height={250}
                       layout={{

@@ -169,7 +169,7 @@ export default function Technique() {
         </div>
         {(xMetric === 'avg_pace_min_km' || xMetric === 'avg_gap_min_km') && yMetric === 'avg_vertical_oscillation' && (
           <p className="text-garmin-muted text-xs mb-2">
-            Points moving right and down over time means faster pace and lower bounce — pure efficiency gain.
+            Points moving right and down over time means faster pace and lower bounce for pure efficiency gain.
             Points moving right and up means you are speeding up with brute force, not better mechanics.
           </p>
         )}
